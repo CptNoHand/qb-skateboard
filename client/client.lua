@@ -45,7 +45,6 @@ RCCar.Start = function()
 			StopCurrentPlayingAmbientSpeech(RCCar.Driver)	
 			if Attached then
 				TriggerServerEvent('skateboard:get')
-				-- Ragdoll system
 				local x = GetEntityRotation(RCCar.Entity).x
 				local y = GetEntityRotation(RCCar.Entity).y
 				
@@ -76,11 +75,8 @@ RCCar.HandleKeys = function(distanceCheck)
 	
 	if distanceCheck < Config.LoseConnectionDistance then
 		local overSpeed = (GetEntitySpeed(RCCar.Entity)*3.6) > Config.MaxSpeedKmh
-		
-		-- prevents ped from driving away
 		TaskVehicleTempAction(RCCar.Driver, RCCar.Entity, 1, 1)
-		ForceVehicleEngineAudio(RCCar.Entity, 0)
-		-- Input Control longboard 
+		ForceVehicleEngineAudio(RCCar.Entity, 0) 
 		if Attached then
 			if IsControlPressed(0, 87) and not IsControlPressed(0, 88) and not overSpeed then
 				TaskVehicleTempAction(RCCar.Driver, RCCar.Entity, 9, 1)
@@ -88,7 +84,6 @@ RCCar.HandleKeys = function(distanceCheck)
 		end
 
 		if IsControlPressed(0, 22) and Attached then
-			-- Jump system
 			if not IsEntityInAir(RCCar.Entity) then	
 				local vel = GetEntityVelocity(RCCar.Entity)
 				TaskPlayAnim(PlayerPedId(), "move_crouch_proto", "idle_intro", 5.0, 8.0, -1, 0, 0, false, false, false)
@@ -99,8 +94,8 @@ RCCar.HandleKeys = function(distanceCheck)
 					duration = duration + 10.0
 					ForceVehicleEngineAudio(RCCar.Entity, 0)
 				end
-				boost = Config.maxJumpHeight * duration / 250.0
-				if boost > Config.maxJumpHeight then boost = Config.maxJumpHeight end
+				boost = Config.maxJumpHeigh * duration / 250.0
+				if boost > Config.maxJumpHeigh then boost = Config.maxJumpHeigh end
 				StopAnimTask(PlayerPedId(), "move_crouch_proto", "idle_intro", 1.0)
 				SetEntityVelocity(RCCar.Entity, vel.x, vel.y, vel.z + boost)
 				TaskPlayAnim(player, "move_strafe@stealth", "idle", 8.0, 2.0, -1, 1, 1.0, false, false, false)
@@ -146,9 +141,7 @@ RCCar.HandleKeys = function(distanceCheck)
 	end
 end
 
-
 RCCar.Spawn = function()
-	-- models to load
 	RCCar.LoadModels({ GetHashKey("triBike3"), 68070371, GetHashKey("p_defilied_ragdoll_01_s"), "pickup_object", "move_strafe@stealth", "move_crouch_proto"})
 
 	local spawnCoords, spawnHeading = GetEntityCoords(PlayerPedId()) + GetEntityForwardVector(PlayerPedId()) * 2.0, GetEntityHeading(PlayerPedId())
@@ -156,7 +149,6 @@ RCCar.Spawn = function()
 	RCCar.Entity = CreateVehicle(GetHashKey("triBike3"), spawnCoords, spawnHeading, true)
 	RCCar.Skate = CreateObject(GetHashKey("p_defilied_ragdoll_01_s"), 0.0, 0.0, 0.0, true, true, true)
 	
-	-- load models
 	while not DoesEntityExist(RCCar.Entity) do
 		Citizen.Wait(5)
 	end
@@ -164,22 +156,19 @@ RCCar.Spawn = function()
 		Citizen.Wait(5)
 	end
 
-	SetHandling() -- Modify hanfling for upgrade the stability
-	SetEntityNoCollisionEntity(RCCar.Entity, player, false) -- disable collision between the player and the rc
+	SetHandling() 
+	SetEntityNoCollisionEntity(RCCar.Entity, player, false)
 	SetEntityCollision(RCCar.Entity, true, true)
 	SetEntityVisible(RCCar.Entity, false)
-	--SetAllVehiclesSpawn(RCCar.Entity, true, true, true, true)
 	AttachEntityToEntity(RCCar.Skate, RCCar.Entity, GetPedBoneIndex(PlayerPedId(), 28422), 0.0, 0.0, -0.60, 0.0, 0.0, 90.0, false, true, true, true, 1, true)
 
 	RCCar.Driver = CreatePed(12	, 68070371, spawnCoords, spawnHeading, true, true)
 
-	-- Driver properties
 	SetEnableHandcuffs(RCCar.Driver, true)
 	SetEntityInvincible(RCCar.Driver, true)
 	SetEntityVisible(RCCar.Driver, false)
 	FreezeEntityPosition(RCCar.Driver, true)
 	TaskWarpPedIntoVehicle(RCCar.Driver, RCCar.Entity, -1)
-	--SetPedAlertness(RCCar.Driver, 0)
 
 	while not IsPedInVehicle(RCCar.Driver, RCCar.Entity) do
 		Citizen.Wait(0)
@@ -222,7 +211,6 @@ RCCar.Attach = function(param)
 	end
 	
 	if param == "place" then
-		-- Place longboard
 		AttachEntityToEntity(RCCar.Entity, PlayerPedId(), GetPedBoneIndex(PlayerPedId(),  28422), -0.1, 0.0, -0.2, 70.0, 0.0, 270.0, 1, 1, 0, 0, 2, 1)
 
 		TaskPlayAnim(PlayerPedId(), "pickup_object", "pickup_low", 8.0, -8.0, -1, 0, 0, false, false, false)
@@ -233,7 +221,6 @@ RCCar.Attach = function(param)
 
 		PlaceObjectOnGroundProperly(RCCar.Entity)
 	elseif param == "pick" then
-		-- Pick longboard
 		Citizen.Wait(100)
 
 		TaskPlayAnim(PlayerPedId(), "pickup_object", "pickup_low", 8.0, -8.0, -1, 0, 0, false, false, false)
@@ -243,8 +230,7 @@ RCCar.Attach = function(param)
 		AttachEntityToEntity(RCCar.Entity, PlayerPedId(), GetPedBoneIndex(PlayerPedId(),  28422), -0.1, 0.0, -0.2, 70.0, 0.0, 270.0, 1, 1, 0, 0, 2, 1)
 		
 		Citizen.Wait(900)
-		
-		-- Clear 
+
 		RCCar.Clear()
 
 	end
