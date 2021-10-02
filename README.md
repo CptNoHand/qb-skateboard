@@ -9,3 +9,6 @@ Add the image into your qb-inventory images folder.
 
 ```
 ["skateboard"] 		 	 		 = {["name"] = "skateboard", 					["label"] = "Skateboard", 			["weight"] = 1425, 		["type"] = "item", 			["image"] = "skateboard.png", 			["unique"] = false, 	["useable"] = true, 	["shouldClose"] = true,    ["combinable"] = nil,   ["description"] = "A cool skateboard!"},```
+
+
+### Press G to get on/off the board and E to pick it up! 
